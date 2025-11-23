@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.api.models.tree_model import Tree
 
 class TreeService:
@@ -25,9 +26,14 @@ class TreeService:
   def save_new_tree_structure(db: Session, tree_data: dict):
       new_tree = Tree(treeStructure=tree_data)
       db.add(new_tree)
+      db.flush() 
+      
+      tree_data_with_id = {"id": str(new_tree.id), **tree_data}
+      new_tree.treeStructure = tree_data_with_id
+      
       db.commit()
       db.refresh(new_tree)
-      return {"id":new_tree.id }
+      return tree_data_with_id
 
 
   @staticmethod
